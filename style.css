@@ -1,0 +1,431 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --team1: #ff6b6b;
+  --team2: #4ecdc4;
+  --gold: #ffd700;
+  --bg: #1a1a2e;
+  --card-back: #16213e;
+  --accent: #e94560;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  padding: 18px 0 8px;
+}
+.header h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.2rem;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(233,69,96,.7);
+}
+.header p {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+/* ── LAYOUT ── */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 10px 20px 0;
+}
+
+/* ── TEAM PANELS ── */
+.team {
+  width: 160px;
+  border-radius: 16px;
+  text-align: center;
+  padding: 14px 10px;
+  flex-shrink: 0;
+  transition: all .3s ease;
+  position: relative;
+}
+.team1 { background: linear-gradient(160deg,#ff6b6b,#ee5a24); }
+.team2 { background: linear-gradient(160deg,#4ecdc4,#0abde3); }
+
+.team h2 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.avatar { font-size: 62px; margin: 6px 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,.3)); }
+
+.preview {
+  width: 100px; height: 100px;
+  background: rgba(255,255,255,.15);
+  border: 3px solid rgba(255,255,255,.4);
+  border-radius: 12px;
+  margin: 8px auto;
+  display: flex; justify-content: center; align-items: center;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+.preview img { width:100%; height:100%; object-fit:cover; border-radius:9px; }
+.preview-placeholder { font-size: 28px; opacity: .4; }
+
+.score-display {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.5rem;
+  color: #fff;
+  margin-top: 6px;
+  text-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+.score-label { font-size: .72rem; color: rgba(255,255,255,.75); font-weight:600; letter-spacing:1px; }
+
+.active-team {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 3px var(--gold), 0 0 40px rgba(255,215,0,.5);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 3px var(--gold), 0 0 20px rgba(255,215,0,.4); }
+  50%      { box-shadow: 0 0 0 3px var(--gold), 0 0 50px rgba(255,215,0,.7); }
+}
+
+.turn-badge {
+  position: absolute;
+  top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--gold); color: #333;
+  font-weight: 800; font-size: .7rem;
+  padding: 3px 10px; border-radius: 20px;
+  white-space: nowrap; letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  display: none;
+}
+.active-team .turn-badge { display: block; }
+
+/* ── BOARD ── */
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 140px);
+  gap: 14px;
+}
+
+/* ── CARD ── */
+.card {
+  width: 140px; height: 120px;
+  border-radius: 14px;
+  cursor: pointer;
+  perspective: 800px;
+  position: relative;
+}
+.card-inner {
+  width:100%; height:100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .5s cubic-bezier(.4,0,.2,1);
+}
+.card.flipped .card-inner  { transform: rotateY(180deg); }
+.card.matched .card-inner  { transform: rotateY(180deg); }
+
+.card-back, .card-front {
+  position:absolute; inset:0;
+  border-radius:14px;
+  backface-visibility: hidden;
+  display:flex; justify-content:center; align-items:center;
+}
+
+.card-back {
+  background: repeating-linear-gradient(
+    45deg,
+    #2c2c6c, #2c2c6c 14px,
+    #3a3a8c 14px, #3a3a8c 28px
+  );
+  border: 3px solid #5a5adc;
+  font-size: 28px;
+}
+.card-back::after {
+  content: '?';
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.8rem;
+  color: rgba(255,255,255,.35);
+}
+
+.card-front {
+  background: #fff;
+  border: 3px solid #ddd;
+  transform: rotateY(180deg);
+  overflow: hidden;
+}
+.card-front img {
+  width:100%; height:100%;
+  object-fit:cover;
+  border-radius:11px;
+}
+
+.card.matched .card-front {
+  border-color: #2ecc71;
+  box-shadow: 0 0 18px rgba(46,204,113,.6);
+}
+.card:not(.matched):not(.flipped):hover .card-inner {
+  transform: rotateY(15deg) scale(1.04);
+}
+
+/* match flash on card */
+.card.match-flash .card-front {
+  animation: matchFlash .5s ease;
+}
+@keyframes matchFlash {
+  0%,100% { filter: brightness(1); }
+  50%      { filter: brightness(1.8) saturate(1.5); }
+}
+
+/* wrong shake */
+.card.shake .card-inner {
+  animation: shake .4s ease;
+}
+@keyframes shake {
+  0%,100% { transform: rotateY(180deg) translateX(0); }
+  25%      { transform: rotateY(180deg) translateX(-8px); }
+  75%      { transform: rotateY(180deg) translateX(8px); }
+}
+
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 60px;
+}
+.turn-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: #fff;
+  text-align: center;
+}
+.turn-text span { color: var(--gold); }
+
+.btn {
+  padding: 10px 22px;
+  border: none; border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px; font-weight: 700;
+  transition: all .2s;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,.4); }
+.btn:active { transform: translateY(0); }
+.btn-reset { background: #e74c3c; color:#fff; }
+.btn-settings { background: #555; color:#fff; }
+
+/* ── MODAL BASE ── */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.75);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(3px);
+}
+.modal.hidden { display: none; }
+.modal-box {
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px 28px;
+  max-width: 480px; width: 90%;
+  text-align: center;
+  animation: popIn .3s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+@keyframes popIn {
+  from { transform: scale(.75); opacity:0; }
+  to   { transform: scale(1);   opacity:1; }
+}
+
+/* ── QUESTION MODAL ── */
+.q-header {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  padding: 6px 14px;
+  display: inline-block;
+  color: #fff;
+}
+.q-header.team1 { background: var(--team1); }
+.q-header.team2 { background: var(--team2); }
+.q-header.steal { background: #9b59b6; }
+
+.q-image {
+  width: 120px; height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 10px auto;
+  display: block;
+  border: 3px solid #eee;
+}
+
+#questionText {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #222;
+  margin: 10px 0 16px;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.choice-btn {
+  background: #f0f0f0;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 12px 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: .92rem; font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  color: #333;
+}
+.choice-btn:hover { background: #e0e0ff; border-color: #8b5cf6; transform: scale(1.03); }
+.choice-btn.correct {
+  background: #2ecc71; border-color: #27ae60; color:#fff;
+  animation: correctPop .4s ease;
+}
+.choice-btn.wrong {
+  background: #e74c3c; border-color: #c0392b; color:#fff;
+  animation: wrongShake .3s ease;
+}
+@keyframes correctPop {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.1); }
+}
+@keyframes wrongShake {
+  0%,100% { transform: translateX(0); }
+  25%,75% { transform: translateX(-6px); }
+  50%      { transform: translateX(6px); }
+}
+
+/* ── ATTEMPT TRACKER ── */
+.attempt-tracker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.attempt-label {
+  font-size: .78rem;
+  font-weight: 700;
+  color: #888;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+#attemptDots {
+  display: flex;
+  gap: 6px;
+}
+.attempt-dot {
+  font-size: 1rem;
+  transition: transform .2s;
+}
+.attempt-dot.used {
+  animation: dotUsed .3s ease;
+}
+@keyframes dotUsed {
+  0%   { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* ── STEAL BANNER ── */
+.steal-banner {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: .92rem;
+  display: none;
+}
+.steal-banner.show { display: block; }
+
+/* ── SCORE POP ── */
+@keyframes scorePop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.4); color: var(--gold); }
+  100% { transform: scale(1); }
+}
+.score-pop { animation: scorePop .5s ease; }
+
+/* ── FLASH OVERLAY ── */
+.flash {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 200;
+  animation: flashAnim .5s ease forwards;
+}
+@keyframes flashAnim {
+  0%   { opacity: .5; background: #fff; }
+  100% { opacity: 0; background: #fff; }
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+  background: #333; color:#fff;
+  padding: 10px 22px; border-radius: 40px;
+  font-weight: 700; font-size: .92rem;
+  z-index: 300;
+  animation: toastIn .3s ease, toastOut .3s ease 1.7s forwards;
+}
+@keyframes toastIn  { from { opacity:0; transform: translate(-50%,20px); } to { opacity:1; transform: translate(-50%,0); } }
+@keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+/* ── WINNER MODAL ── */
+#winnerModal .modal-box {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff;
+}
+.winner-trophy { font-size: 4rem; margin: 10px 0; }
+.winner-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2rem;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(255,215,0,.6);
+}
+.winner-scores {
+  margin: 14px 0;
+  font-size: 1rem;
+  color: #aaa;
+}
+.btn-play-again {
+  background: linear-gradient(135deg, var(--team1), var(--accent));
+  color: #fff; padding: 12px 30px;
+  border: none; border-radius: 12px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem; cursor: pointer; margin-top: 10px;
+}
+
+/* ── SETTINGS MODAL ── */
+#settingsModal .modal-box { background: #1a1a2e; color:#fff; }
+#settingsModal h2 {
+  font-family: 'Fredoka One', cursive;
+  color: var(--gold); margin-bottom: 18px; font-size:1.5rem;
+}
+.setting-group { margin-bottom: 18px; text-align:left; }
+.setting-group label { display:block; font-weight:700; margin-bottom:6px; color:#ccc; font-size:.88rem; }
+.setting-group input, .setting-group select {
+  width:100%; padding:9px 12px; border-radius:10px;
+  border:2px solid #333; background:#0f3460; color:#fff;
+  font-family:'Nunito',sans-serif; font-size:.9rem;
+}
+.setting-group input:focus, .setting-group select:focus { border-color: var(--gold); outline:none; }
+.settings-btns { display:flex; gap:10px; justify-content:center; margin-top:8px; }
+.btn-save { background: #2ecc71; color:#fff; }
+.btn-cancel-s { background: #555; color:#fff; }
